@@ -55,16 +55,16 @@ class FloX5Device:
         if station is None:
             raise Exception("Station not found: " + self.station_name)
 
-        self.logger.info(
-            "Creating device for station: " + station["information"]["name"]
-        )
+        meta = self.client.get_device_meta(station)
+
+        self.logger.info("Creating device for station: " + meta["name"])
 
         # Define the device. At least one of `identifiers` or `connections` must be supplied
         self.device_info = DeviceInfo(
-            name="Flo X5: " + station["information"]["name"],
-            model=station["information"]["model"],
-            manufacturer="AddEnergie",
-            identifiers=station["information"]["id"],
+            name=meta["name"],
+            model=meta["model"],
+            manufacturer=meta["manufacturer"],
+            identifiers=meta["identifiers"],
         )
 
     def _initialize_sensors(self) -> None:
@@ -182,7 +182,12 @@ class FloX5Device:
         if station is None:
             return None
 
-        station_id = station["information"]["id"]
+        try:
+            station_id = self.client.station_id(station)
+        except Exception:
+            station_id = (
+                station.get("chargingStationUid") or station["information"]["id"]
+            )
 
         return self.client.get_session_by_id(station_id)
 

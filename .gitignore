@@ -2,3 +2,4 @@ refresh.json
 __pycache__
 docker-compose.yaml
 data
+.env

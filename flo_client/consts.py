@@ -8,6 +8,8 @@ DATA_FOLDER = "data"
 BASE_URL = "https://emobility.flo.ca"
 STATIONS_URL = BASE_URL + "/v3.0/user/stations"
 SESSIONS_URL = BASE_URL + "/v3.0/user/sessions"
+HOMESTATION_URL_V31 = BASE_URL + "/v3.1/homestation"
+SESSIONS_URL_V31 = BASE_URL + "/v3.1/user/sessions"
 
 # Identity provider information and URLs
 ACCOUNT_ID = "6cedc65f-98e2-4651-bdb8-88ee4936c9ba"
