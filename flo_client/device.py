@@ -259,3 +259,47 @@ class FloX5Device:
             self.amperage_charging_sensor.set_state(0)
             self.amperage_offered_sensor.set_state(0)
             self.voltage_sensor.set_state(0)
+
+    
+    # Add to flo_client/device.py inside FloX5Device class
+
+    def set_schedule(self, schedule_data):
+        """
+        Pushes a schedule to the Flo v3.0 API.
+        """
+        import requests
+        from flo_client.consts import STATIONS_URL
+
+        # 1. Resolve Station UUID (Handles method vs property difference)
+        try:
+            # Try calling as function first (most likely)
+            real_uuid = self.client.station_id()
+        except TypeError:
+            # Fallback to property or passing self
+            try:
+                real_uuid = self.client.station_id(self.client._selected_station)
+            except:
+                real_uuid = getattr(self.client, 'station_id', None)
+
+        if not real_uuid:
+            print("❌ [Device] Error: Could not resolve Station UUID.")
+            return False
+
+        # 2. Resolve Auth Headers (Bypassing read-only transport)
+        try:
+            headers = self.client._get_headers()
+        except TypeError:
+            headers = self.client._get_headers
+
+        # 3. Send Request
+        url = f"{STATIONS_URL}/{real_uuid}/power-schedule"
+        try:
+            resp = requests.put(url, json=schedule_data, headers=headers, timeout=10)
+            if resp.status_code == 200:
+                return True
+            else:
+                print(f"❌ [Device] API Error {resp.status_code}: {resp.text}")
+                return False
+        except Exception as e:
+            print(f"❌ [Device] Request Exception: {e}")
+            return False
