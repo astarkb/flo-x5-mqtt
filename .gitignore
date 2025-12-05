@@ -3,3 +3,6 @@ __pycache__
 docker-compose.yaml
 data
 .env
+.venv
+.vscode
+launch.json

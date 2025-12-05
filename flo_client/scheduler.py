@@ -87,9 +87,21 @@ class FloScheduler:
         periods = []
         for i, s in self.slots.items():
             if s['enabled']:
-                start, end = self._time_to_min(s['start']), self._time_to_min(s['stop'])
-                if start != end:
-                    periods.append({"days": [7,1,2,3,4,5,6], "maxCurrent": 0, "from": start, "to": end})
+                start_min = self._time_to_min(s['start'])
+                end_min = self._time_to_min(s['stop'])
+                
+                # Si l'heure de fin est 00:00 et que l'heure de début est non-nulle,
+                # on assume que 00:00 = 1440 minutes (fin de journée)
+                if s['stop'] == "00:00" and start_min != 0:
+                    end_min = 1440
+                
+                if start_min != end_min:
+                    periods.append({
+                        "days": [7, 1, 2, 3, 4, 5, 6],
+                        "maxCurrent": 0, 
+                        "from": start_min,
+                        "to": end_min
+                    })
         
         return {
             "enabled": len(periods) > 0,
